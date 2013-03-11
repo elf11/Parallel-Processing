@@ -1,0 +1,37 @@
+TEMA 3 APD
+PRELUCRAREA IMAGINILOR
+NICULAESCU OANA 331CB
+
+Scopul temei a fost implementarea unui program care va realiza crearea unor imagini de fractali in conformitate cu cei doi algorimi Mandelbrot si Julia.
+Tema este structurata in 3 functii principale : main, master si slave. Functia main initiaza unul dintre procesele master sau slave, in fuctie de rangul procesului.
+In functia master calculez modul in care matricea va fi mai tarziu impartita pentru a putea fi data spre rezolvare workerilor. Am decis sa impart matricea finala in stripe-uri de dimensiune height/nrThreaduri si width, unde height si width sunt dimensiunile calculate cu cele 2 formule furnizate.
+Masterul pastreaza intotdeauna prima bucata din matrice pentru sine si apoi trimite pachete tuturor celorlalte procese cu informatiile necesare pentru a-si calcula propria bucata de matrice pe care trebuie sa o computeze.
+Fiecare worker primeste informatii - width, height, y_min, y_max, x_min, x_max, numar maxim de iteratii, rezolutie, pe baza carora calculeaza linia din matricea finala unde ar trebui inserata bucata computata de el precum si newy_min de la care acesta va incepe computarea.
+Imbunatatirea adusa de algoritm este aceea ca acum un singur procesor nu mai este nevoit sa realizeze intreaga munca, ea poate fi impartita la mai multe procesoare si astfel durata de rezolvare a sarciniilor se va micsora pentru imaginii mari.
+
+Performantele obtinute nu sunt relevante pentru dimensiunile imaginilor furnizate, totusi algoritmul scaleaza in mod evident - timpul de executie scade o data cu marirea numarului de procese.
+
+Timpi de rulare :
+
+qsub - mandelbrot1
+2 procese 
+real	0m10.489s
+user	0m12.344s
+sys	0m0.444s
+
+3 procese
+real	0m8.373s
+user	0m12.522s
+sys	0m0.431s
+
+4 procese
+real	0m8.812s
+user	0m12.775s
+sys	0m0.466s
+
+8 procese
+real	0m8.633s
+user	0m16.773s
+sys	0m0.509s
+
+

@@ -1,0 +1,177 @@
+Materia : ALGORITMI PARALELI SI DISTRIBUITI
+Tema  1 - Colonistii
+NUME: NICULAESCU OANA 331CB
+
+Compilare :
+in urma rularii comenzii "make" vor aparea 2 executabile : serial si paralel.
+
+./serial -> varianta seriala
+./paralel -> varianta paralela
+Am inclus scriptul run.sh pentru rulare precum si scriptul submit.sh, pentru rularea cu
+qsub, aici trebuie modificate la fiecare rulare numele fisierului de intrare si al fisierului cu care 
+se va realiza comparatia la diff.
+
+Metoda de implementare seriala :
+
+Algoritmul serial este unul naiv: calculam costul resursei care se gaseste
+in celula (i,j) precum si costul resursei complementare celului (i,j) pentru
+anul curent apoi in fiecare an ajustam bugetul fiecarei celule si costul resursei
+proprii in functie de pretul minim al resursei de bugetul alocat din anul curent
+precum si de costul celei mai ieftine resurse complementare pe care celula proprie
+o poate gasi. 
+Pentru retinerea tipului de resursa dintr-o celula, costul resursei proprii,
+a bugetului, a costului resursei complementare si a pretului resursei proprii am
+utilizat o structura de tip Colonists, care inglobeaza toate aceste matrice de dimensiune
+nxn. Pentru retinerea matricelor pe o perioada de T ani am utilizat o structura
+de tip ani(years) de tip Colonists.
+
+Metoda de implementare paralela :
+
+In varianta paralela am paralelizat modul de calcul si updatare al bugetului,
+costului si pretului pentru fiecare celula in fiecare an. Pentru aceasta am utilizat 
+o directiva de tipul "#pragma omp parallel for", unde am pastrat in memoria locala a 
+fiecarui thread variabilele (i,j) - indicii celulei si in memoria globala a tuturor threadurilor 
+variabila globala in care retinem structura tuturor anilor.
+
+CALCULUL COMPLEXITATII TEORETICE - VARIANTA NEOPTIMIZATA
+
+Complexitatea variantei neoptimizate este data de functia CalculateAll() - unde se realizeaza updatarea
+valorilor pretului resursei, bugetului pentru anul urmator si a pretului resursei complementare.
+Complexitatea acestei functii este O(T * n^4), unde n este numarul de celule/dimensiunea matricei, iar
+T este numarul anilor pe parcursul carora monitorizam colonistii. Dar T este o constanta, deci complexitatea algoritmului este O(N^4).
+
+ANALIZA PERFORMANTEI IMPLEMENTARILOR
+
+VARIANTA SERIALA
+
+varianta 50:
+	real	0m28.953s
+	user	0m24.774s
+	sys		0m0.147s
+
+
+varianta 100 :
+	real	0m34.985s
+	user	0m33.555s
+	sys		0m0.602s
+
+
+Testele le-am realizat pentru fisierele de 100x100, pentru 50 de ani, respectiv
+50x50 pentru 500 de ani.
+In toate testele chunk este 4.
+
+VARINTA PARALELA
+nr threaduri = 1: (schedule/chunk sunt irelevante)
+varianta 50 :
+dynamic:
+	real	0m26.120s
+	user	0m25.968s
+	sys		0m0.142s
+
+SPEED-UP =1.1084
+
+varianta 100:
+static:
+	real	0m34.974s
+	user	0m34.339s
+	sys		0m0.592s
+dynamic:
+	real	0m34.983s
+	user	0m34.364s
+	sys		0m0.593s
+
+SPEED-UP =  1.0000(nerelevant)
+
+nr threaduri = 2:
+schedule dynamic :
+varianta 50:
+	real	0m16.048s
+	user	0m31.569s
+	sys		0m0.358s
+
+SPEED UP = 1.7542
+
+varianta 100:
+	real	0m20.086s
+	user	0m38.822s
+	sys	0m0.682s
+
+SPEED UP = 1.7417
+
+schedule static :
+varianta 50:
+	real	0m14.583s
+	user	0m28.659s
+	sys	0m0.337s
+
+SPEED UP = 1.9305
+
+varianta 100:
+	real	0m20.350s
+	user	0m39.348s
+	sys		0m0.684s
+
+SPEED-UP = 	1.7191
+
+
+nr threaduri = 4:
+schedule dynamic : 
+varianta 50:
+	real	0m12.304s
+	user	0m48.264s
+	sys		0m0.454s
+
+SPEED UP = 2.2881
+
+varianta 100:
+	real	0m12.822s
+	user	0m48.617s
+	sys		0m0.733s
+
+SPEED UP = 2.7285
+
+schedule static :
+varianta 50 :
+	real	0m12.817s
+	user	0m50.230s
+	sys		0m0.514s
+
+SPEED UP = 2.1965
+
+varianta 100 :
+	real	0m13.215s
+	user	0m50.208s
+	sys	0m0.713s
+
+SPEED UP =  2.6473
+
+nr threaduri = 8:
+schedule dynamic :
+varianta 50:
+	real	0m9.898s
+	user	1m17.403s
+	sys	0m0.524s
+
+SPEED UP =	2.8443
+
+varianta 100:
+	real	0m9.457s
+	user	1m10.110s
+	sys	0m0.765s
+
+SPEED UP = 3.6693
+
+schedule static :
+varianta 50:
+	real	0m22.091s
+	user	2m11.523s
+	sys	0m0.472s
+
+SPEED UP =	1.2744
+
+varianta 100:
+	real	0m8.870s
+	user	1m5.639s
+	sys	0m0.735s
+
+SPEED UP = 3.9441

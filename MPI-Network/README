@@ -1,0 +1,35 @@
+NICULAESCU OANA
+331CB
+
+TEMA 4 - SIMULAREA UNEI RETELE IN MPI
+
+compilare : make
+rulare : mpirun -np numar_procese ./retea fis_topo fis_msg
+
+Mod de functionare:
+
+Partea 1 : Sa se descopere modul in care sunt conectate toate buncarele pentru a putea incepe sa se organizeze
+Se citeste topologia din fisier si se salveaza intr-un vector bidimensional. Se porneste algoritmul de realizare a tabelei de rutare.
+Algoritm de descoperire a topologiei este urmatorul : toate procesele mai putin root(initiatorul) asteapta mesaje de tip sondaj de la parinte. 
+Fiecare proces trimite mesaje de tip sonda tuturor vecinilor, mai putin parintelui. Nodul curent asteapta de la toti vecinii mai putin parintele
+un mesaj (sonda sau ecou), daca mesajul e sonda, trimit inapoi topologie nula vecinului, si vecinul poate fi scos din topologie, in sensul ca daca ar ramane acolo am realiza bucle.
+Daca mesajul e un ecou, updatez topologia. Trimit topologia parintelui. In tabela de rutare o intrare redundanta va fi reprezentata prin -1.
+
+
+Partea 2 : Stabilirea unui sistem de posta prin care supravietuitorii sa isi poata trimite mesajele:
+Se citesc mesajele din fisier. Daca sursa este procesul curent atunci el va trimite un mesaj continand , sura, destinatia, mesajul la procesul indicat
+de tabela de rutare. Daca este un mesaj de tip Broadcast atunci procesul curent trimite mesajul tuturor vecinilor conectati conform topologiei.
+La final se va trimite un mesaj prin care se confirma faptul ca s-a incheiat transmisia datelor.
+Fiecare proces este intr-o bucla de rutare a mesajelor. In functie de mesajul primit acesta este afisat sau rutat conform tabelei de rutare.
+
+Partea 3 : Stabilirea unor structuri de conducere
+Procesul de alegere a unui lider este random, fiecare proces alege un lider in mod random si trimite raspunsul procesului 0, care este si initiatorul
+acestui vot. Procesul 0 trimite un mesaj tuturor celorlalte procese prin care le invita la vot, aceste procese voteaza si trimit rezultatul 
+procesului centralizator(procesul 0). Procesul se repeta pana in momentul in care se alege un lider si un secund valizi. Procesul centralizator in 
+urma numararii voturilor trimite un mesaj tuturor celorlalte procese care afiseaza liderul si secundul.
+
+OBSERVATII:
+Mesajele primite sunt afisate printre topologii si tabele de rutare. 
+Uneori imi da signal 6 error, incearca sa rulezi de mai multe ori nu am reusit sa scot eroarea :(.
+
+
